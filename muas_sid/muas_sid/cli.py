@@ -91,6 +91,14 @@ def parse_command_line(argv: list = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "-c",
+        "--cache",
+        action="store_true",
+        required=False,
+        help="Read from previously cached intermediary steps"
+    )
+
+    parser.add_argument(
         "-v",
         "--verbose",
         action="count",
@@ -131,5 +139,6 @@ def parse_command_line(argv: list = None) -> argparse.Namespace:
         logger.setLevel(logging.DEBUG)
     else:
         logger.setLevel(max(3 - args.verbose_count, 1) * 10)
+    args.cache_path = Path(args.input_path.with_suffix(""))
 
     return args
