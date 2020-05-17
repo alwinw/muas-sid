@@ -6,22 +6,20 @@ import os
 import sys
 from pathlib import Path
 
-import pymavlink
-
 from muas_sid import __version__
 
 module = sys.modules["__main__"].__file__
 logger = logging.getLogger(module)
 
 
-def existing_file(value: str, extensions: list = None) -> Path:
+def existing_file(value: str, extensions: tuple = None) -> Path:
     """Check object is an existing file
 
     Arguments:
         value {str} -- File path
-    
+
     Keyword Arguments:
-        extensions {list} -- Possible file extensions (default: {None})
+        extensions {tuple} -- Possible file extensions (default: {None})
 
     Raises:
         IOError: Not an existing file
@@ -51,7 +49,7 @@ def existing_directory(value: str) -> Path:
         value {str} -- Directory path
 
     Raises:
-        IOError: Not an existing directory 
+        IOError: Not an existing directory
         argparse.ArgumentTypeError: Exists, but is not a directory
 
     Returns:
@@ -86,10 +84,10 @@ def parse_command_line(argv: list = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
-        "log_path",
+        "input_path",
         action="store",
-        type=lambda f: existing_file(f, [".bin"]),
-        help="Path to .bin log file",
+        type=lambda f: existing_file(f, (".bin", ".log", ".tlog")),
+        help="Input path to file ending with (.bin, .log, .tlog)",
     )
 
     parser.add_argument(
@@ -123,6 +121,8 @@ def parse_command_line(argv: list = None) -> argparse.Namespace:
         version="%(prog)s {}".format(__version__),
         help="show the version and exit",
     )
+
+    # TODO: Add interactive mode via iPython
 
     args = parser.parse_args()
     if args.silent:
