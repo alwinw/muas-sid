@@ -12,24 +12,35 @@
 #include <Eigen/Dense>
 
 
+namespace oe_dragpolar
+{
+    constexpr unsigned int num_state_variables = 4;
+    constexpr unsigned int num_output_variables = 5;
+    constexpr unsigned int num_control_variables = 3;
+    constexpr unsigned int num_parameters = 18; 
+};
 
-class OutputError_DragPolar : public OutputError<8,6,4,31>
+
+class OutputError_DragPolar : public OutputError<oe_dragpolar::num_state_variables, oe_dragpolar::num_output_variables, 
+                                                 oe_dragpolar::num_control_variables, oe_dragpolar::num_parameters>
 {
 public:
     OutputError_DragPolar(const Inertia &inertia, const FixedWingDimensions &dimensions, 
                           const LogDataExtractor_IMU *log_data_imu, const LogDataExtractor_ARSP *log_data_arsp);
 
-    static constexpr unsigned int num_state_variables = 8;
-    static constexpr unsigned int num_output_variables = 6;
-    static constexpr unsigned int num_control_variables = 4;
-    static constexpr unsigned int num_parameters = 31;
+    // Options
+    enum class AirspeedInterpolationType
+    {
+        MEAN,
+        BARYCENTRIC_RATIONAL,
+    } airspeed_interpolation_type;
 
 
 private:
     // f(x(t,p), u(t,p), t)
-    void state_equation(const DynamicState &x, const ControlState &u, const Parameters &p, DynamicState &dxdt, const double t) override; 
+    void state_equation(const DynamicState &state, const ControlState &control, const Parameters &param, DynamicState &sate_derivative, const double time) override; 
     // g(x(t,p), u(t,p), t)
-    void output_equation(const DynamicState &x, const ControlState &u, const Parameters &p, OutputState &y, const double t) override; 
+    void output_equation(const DynamicState &state, const ControlState &control, const Parameters &param, OutputState &state_derivative, const double time) override; 
 
     // Log data
     void extract_imu_data(const LogDataExtractor_IMU *log_data_imu);
